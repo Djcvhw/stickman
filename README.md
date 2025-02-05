@@ -1,2 +1,1 @@
-# hello-world
-Hello world new project template.
+# Stick Hero on Cocos Creator 2.4
