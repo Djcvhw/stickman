@@ -1,5 +1,6 @@
 const { ccclass, property } = cc._decorator;
 import Game from './Game'
+import Player from './Player';
 
 @ccclass
 export default class Stick extends cc.Component {
@@ -32,7 +33,7 @@ export default class Stick extends cc.Component {
   stopIncrease() {
     this.isIncrease = false;
     cc.tween(this.node)
-      .to(this.getComponent("Stick").tween, { angle: -90 })
+      .to(this.tween, { angle: -90 })
       .call(() => {
         cc.audioEngine.playEffect(this.fallAudio, false);
       })
@@ -41,7 +42,7 @@ export default class Stick extends cc.Component {
   }
 
   stop() {
-    this.game.player.getComponent("Player").run(this.node.height);
+    this.game.player.getComponent(Player).run(this.node.height);
   }
 
   update(dt) {

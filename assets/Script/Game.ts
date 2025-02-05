@@ -1,4 +1,8 @@
 const { ccclass, property } = cc._decorator;
+import Platform from './Platform'
+import Player from './Player'
+import Camera from './Camera';
+import Stick from './Stick';
 
 @ccclass
 export default class Game extends cc.Component {
@@ -23,6 +27,12 @@ export default class Game extends cc.Component {
   @property(cc.Node)
   bg: cc.Node = null;
 
+  @property(cc.Node)
+  startScreen: cc.Node = null;
+
+  @property(cc.Node)
+  gameOverScreen: cc.Node = null;
+
   @property({
     type: cc.AudioClip,
   })
@@ -33,9 +43,6 @@ export default class Game extends cc.Component {
   })
   backgroundAudio: cc.AudioClip = null;
 
-  @property(cc.Integer)
-  min_space_between = 150;
-
   @property(cc.Prefab)
   stickPrefab: cc.Prefab = null;
 
@@ -43,21 +50,25 @@ export default class Game extends cc.Component {
   public sticks: cc.Node[] = [];
   private player: cc.Node = null;
   private score: number = 0;
-  private height: number = -900;
   private maxScore: number = 0;
+  private platformYpos: number = 0;
 
   init() {
     const platform = cc.instantiate(this.platformPrefab);
+    this.platformYpos = -this.node.height / 2;
     this.node.addChild(platform);
-    platform.width = 300;
-    platform.setPosition(platform.width - this.node.width, this.height);
-    platform.getComponent("Platform").init(this);
+    platform.width = this.node.width * 0.25;
+    platform.setPosition(-this.node.width / 2, this.platformYpos);
+    platform.getComponent(Platform).init(this);
     this.platforms.push(platform);
     this.player = cc.instantiate(this.playerPrefab);
     this.node.addChild(this.player);
-    this.player.setPosition(platform.x + platform.width - this.player.width, -300);
-    this.player.getComponent("Player").init(this);
-    this.camera.getComponent("Camera").init(this);
+    this.player.setPosition(
+      platform.x + platform.width - this.player.width,
+      platform.height + this.platformYpos
+    );
+    this.player.getComponent(Player).init(this);
+    this.camera.getComponent(Camera).init(this);
   }
 
   onLoad() {
@@ -68,10 +79,10 @@ export default class Game extends cc.Component {
   }
 
   onStartGame() {
-    cc.tween(this.camera.getChildByName("StartScreen"))
+    cc.tween(this.startScreen)
       .to(1, { opacity: 0 })
       .call(() => {
-        this.camera.getChildByName("StartScreen").active = false;
+        this.startScreen.active = false;
         this.nextTick();
       })
       .start();
@@ -88,10 +99,10 @@ export default class Game extends cc.Component {
   }
 
   onResetGame() {
-    cc.tween(this.camera.getChildByName("GameOverScreen"))
+    cc.tween(this.gameOverScreen)
       .to(1, { opacity: 0 })
       .call(() => {
-        this.camera.getChildByName("GameOverScreen").active = false;
+        this.gameOverScreen.active = false;
         this.score = 0;
         this.scoreDisplay.string = this.score.toString();
         this.platforms.forEach((platform) => {
@@ -108,8 +119,8 @@ export default class Game extends cc.Component {
       .start();
   }
   showStartScreen() {
-    this.camera.getChildByName("StartScreen").active = true;
-    cc.tween(this.camera.getChildByName("StartScreen"))
+    this.startScreen.active = true;
+    cc.tween(this.startScreen)
       .to(1, { opacity: 255 })
       .call(() => {
         this.init();
@@ -118,10 +129,8 @@ export default class Game extends cc.Component {
   }
 
   showGameOverScreen() {
-    this.camera.getChildByName("GameOverScreen").active = true;
-    cc.tween(this.camera.getChildByName("GameOverScreen"))
-      .to(1, { opacity: 255 })
-      .start();
+    this.gameOverScreen.active = true;
+    cc.tween(this.gameOverScreen).to(1, { opacity: 255 }).start();
   }
 
   nextTick() {
@@ -132,18 +141,18 @@ export default class Game extends cc.Component {
       prevPlatform.x + prevPlatform.width - stick.width,
       prevPlatform.y + prevPlatform.height
     );
-    const stickComponent = stick.getComponent("Stick");
+    const stickComponent = stick.getComponent(Stick);
     stickComponent.init(this);
     this.sticks.push(stick);
     const platform = cc.instantiate(this.platformPrefab);
     this.node.addChild(platform);
     const space = this.getRandom(
-      this.min_space_between,
+      platform.width / 2,
       this.node.width - platform.width - prevPlatform.width
     );
-    platform.setPosition(prevPlatform.x + prevPlatform.width + space, this.height * 2);
-    platform.getComponent("Platform").init(this);
-    platform.getComponent("Platform").slide();
+    platform.setPosition(prevPlatform.x + prevPlatform.width + space, this.platformYpos);
+    platform.getComponent(Platform).init(this);
+    platform.getComponent(Platform).slide();
     this.platforms.push(platform);
     this.destroyOldPlatform();
   }
@@ -152,7 +161,7 @@ export default class Game extends cc.Component {
     cc.tween(this.player)
       .to(1, { position: cc.v3(this.player.x, this.player.y - 2000), angle: -90 })
       .call(() => {
-        this.showGameOverScreen()
+        this.showGameOverScreen();
         if (this.score > this.maxScore) {
           this.maxScore = this.score;
         }
@@ -162,11 +171,13 @@ export default class Game extends cc.Component {
       .start();
   }
   startIncrease() {
-    const stick = this.sticks[this.sticks.length - 1].getComponent("Stick");
+    console.log({ startIncrease: this.sticks[this.sticks.length - 1] });
+    const stick = this.sticks[this.sticks.length - 1].getComponent(Stick);
     stick.startIncrease();
   }
   stopIncrease() {
-    const stick = this.sticks[this.sticks.length - 1].getComponent("Stick");
+    console.log({ stopIncrease: this.sticks[this.sticks.length - 1] });
+    const stick = this.sticks[this.sticks.length - 1].getComponent(Stick);
     stick.stopIncrease();
   }
   getRandom(min, max) {

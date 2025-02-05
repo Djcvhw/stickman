@@ -44,7 +44,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 200,
-      "height": 600
+      "height": 160
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -123,7 +123,7 @@
       "ctor": "Float64Array",
       "array": [
         100,
-        580,
+        140,
         0,
         0,
         0,
@@ -260,9 +260,6 @@
     "positionY": 200,
     "tween": 1,
     "min_space_between": 50,
-    "stickPrefab": {
-      "__uuid__": "4d42ddd7-abc7-4d25-bc0a-b0df0755a3b6"
-    },
     "trigger": {
       "__id__": 2
     },

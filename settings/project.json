@@ -4,7 +4,13 @@
       true
     ]
   ],
-  "excluded-modules": [],
+  "excluded-modules": [
+    "3D",
+    "3D Primitive",
+    "3D Physics/cannon.js",
+    "3D Physics/Builtin",
+    "3D Particle"
+  ],
   "group-list": [
     "default"
   ],
@@ -20,7 +26,7 @@
     "width": 960,
     "height": 640
   },
-  "last-module-event-record-time": 0,
+  "last-module-event-record-time": 1738765623198,
   "assets-sort-type": "name",
   "facebook": {
     "enable": false,
@@ -33,5 +39,8 @@
     }
   },
   "preview-port": 7456,
-  "clear-simulator-cache": true
+  "clear-simulator-cache": true,
+  "migrate-history": [
+    "cloud-function"
+  ]
 }

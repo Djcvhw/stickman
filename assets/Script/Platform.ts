@@ -16,11 +16,8 @@ export default class Platform extends cc.Component {
   @property(cc.Integer)
   tween = 1;
 
-  @property(cc.Integer)
-  min_space_between = 150;
-
   @property(cc.Node)
-  trigger: cc.Node = null;
+  public trigger: cc.Node = null;
 
   private game = null;
   private platformWidth: number = 0;
@@ -28,6 +25,8 @@ export default class Platform extends cc.Component {
   init(game: Game): void {
     this.game = game;
     this.node.zIndex = 1;
+    this.node.height = this.game.node.height * 0.25;
+    this.trigger.setPosition(this.node.width / 2, this.trigger.y);
   }
 
   slide() {
@@ -35,10 +34,10 @@ export default class Platform extends cc.Component {
     this.platformWidth =
       prevPlatform.width * 0.8 < this.trigger.width ? this.trigger.width : prevPlatform.width * 0.8;
     this.node.width = this.platformWidth;
-    this.trigger.setPosition(this.platformWidth / 2, this.trigger.y);
+    this.trigger.setPosition(this.node.width / 2, this.trigger.y);
 
     cc.tween(this.node)
-      .to(this.getComponent("Platform").tween, { position: cc.v3(this.node.x, this.game.height) })
+      .to(this.tween, { position: cc.v3(this.node.x, this.game.platformYpos) })
       .start();
   }
 }
